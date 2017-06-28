@@ -1,0 +1,385 @@
+<!DOCTYPE html>
+<html>
+<head>
+	<title>MARIO</title>
+	<meta name="viewport" content="width=device-width, initial-scale=1.0">
+	<link href="https://fonts.googleapis.com/css?family=Press+Start+2P" rel="stylesheet">
+</head>
+<body>
+
+	<div class="mario-game" id="container">
+		<div class="scorebar">
+			<p><span class="topline-mario">MARIO</span>
+				<span class="topline-world">WORLD</span>
+				<span class="topline-time">TIME</span>
+				<span id="bottomline-score">000000</span>
+				<span id="bottomline-coin"><img src="https://raw.githubusercontent.com/LantareCode/random-this-and-thats/master/CSS/SuperMario-Animation/images/Coin.gif" height="40px"> x <span id="updateCoins">00</span></span>
+				<span class="bottomline-world">1 - 1</span>
+				<span class="bottomline-time" id="timeLeft">000</span>
+			</p>
+		</div>
+		<div id="background"></div>
+		<div id="foreground" class="layer foreground"></div>
+		<div id="items" class="layer"><div id="block"> <img src="coin.gif" alt="" id="coin"/></div></div>
+		<div id="plants" class="layer plants"></div>
+		<div id="moutains" class="layer moutains"></div>
+		<div id="clouds" class="layer clouds"></div>
+		<div id="mario" class="lookingRight"></div>
+
+	</div>
+
+	<script>
+
+
+		var container = document.getElementById("container");
+		var foreground = document.getElementById("foreground")
+		var plants = document.getElementById("plants");
+		var moutains  = document.getElementById("moutains");
+		var clouds  = document.getElementById("clouds");
+		var mario = document.getElementById("mario");
+		var items = document.getElementById("items");
+		var runningRight = 0;
+		var runningLeft = 0;
+		var score = 0;
+		var coins = 0;
+		var dead = 0;
+
+		setInterval(function(){
+			if(runningRight == 1){
+				move(foreground, -40);
+				move(items, -40);
+				move(plants, -23);
+				move(moutains, -6);
+				move(clouds, -4);
+				mario.classList.remove("lookingLeft");
+				mario.classList.add("lookingRight");
+				mario.classList.add("runningRight");
+			}
+		}, 10);
+
+
+		setInterval(function(){
+
+			if (parseInt(foreground.style.left) > 150  && dead == 0) {
+				audio = new Audio('die.wav');
+				audio.play(); 
+				dead = 1;
+			}
+
+		}, 10)
+
+		setInterval(function(){
+			if(runningLeft == 1){
+				move(foreground, 40);
+				move(items, 40);
+				move(plants, 23);
+				move(moutains, 6);
+				move(clouds, 4);
+				mario.classList.remove("lookingRight");
+				mario.classList.add("lookingLeft");
+				mario.classList.add("runningLeft");
+			}
+		}, 10);
+
+		function updateScore(value) {
+			score += value;
+			coins += 1;
+			document.getElementById("updateCoins").innerHTML = "0" + coins;
+			document.getElementById("bottomline-score").innerHTML = "000" + score;
+		}
+
+		var timeLeft = 0;
+		window.setInterval(
+			function () {
+				timeLeft += 1;
+				document.getElementById("timeLeft").innerHTML = "00" + timeLeft;
+
+			}, 1000);
+
+		
+
+		//var music = new Audio('overworld.mp3');
+		// music.play();
+		document.addEventListener("keydown", function() {
+			keyReturn(event);
+		});
+		document.addEventListener("keyup", noMove);
+
+		function noMove() {
+			runningRight = 0;
+			runningLeft = 0;
+			mario.classList.remove("runningLeft");
+			mario.classList.remove("runningRight");
+		}
+
+		function keyReturn(e){
+
+			if (event.keyCode == 37) {
+				runningLeft = 1;
+			}
+
+			if (event.keyCode == 39) {
+				runningRight = 1;						
+			}
+
+			if (event.keyCode == 38) {
+				jumping = 1;
+				mario.classList.add("jumping");
+				audio = new Audio('jump.wav');
+				audio.play(); 
+
+				setTimeout(function(){
+					mario.classList.remove("jumping")
+				}, 500);
+				if (parseInt(foreground.style.left) < -645 &&  parseInt(foreground.style.left) > -710) {
+					console.log("coin!");
+					audio = new Audio('coin.mp3');
+					setTimeout(function() {
+						audio.play(); 
+						updateScore(100);
+						document.getElementById("coin").classList.add("active");
+						setTimeout(function(){
+							document.getElementById("coin").classList.remove("active");
+						}, 400)
+					}, 200);
+					
+				}
+
+			}
+		}
+
+
+		function move(element, speed) {
+			oldPosition = window.getComputedStyle(element);
+			checkStyle = oldPosition.getPropertyValue("left");
+			newPosition = parseInt(checkStyle) + speed;
+			element.style.left = newPosition + "px";
+		}
+
+
+
+
+
+	</script>
+
+
+	<style>
+
+		html, body{
+			font-family: 'Press Start 2P', cursive;
+			height: 100%;
+			width: 100%;
+			overflow:hidden;
+			margin: 0; 
+			padding: 0;
+		}
+		.mario-game {
+			position: fixed;
+			top: 0;
+			left: 0;
+			right: 0;
+			bottom: 0;
+			font-family: sans-serif;
+			height: 715px;
+		}
+		.mario-game #background {
+			position: absolute;
+			top: 0;
+			left: 0;
+			right: 0;
+			bottom: 0;
+			background: #6b88ff;
+			z-index: 1;
+		}
+
+		.layer {
+			position: absolute;
+			top: 0;
+			left: 0;
+			right: 0;
+			bottom: 0;
+			transition: all 0.1s linear;
+			background-size: cover!important;
+		}
+
+		#foreground {
+			background: url("mario_layer_1.gif");
+			z-index: 4;
+		}
+
+		#plants {
+			background: url("mario_layer_2.gif");
+			z-index: 3;
+		}
+
+		#mountains {
+			background: url("mario_layer_3.gif");
+			z-index: 2;
+		}
+
+		#clouds {
+			background: url("mario_layer_4.gif");
+			z-index: 1;
+		}
+
+		.mario-game #mario {
+			position: absolute;
+			left: 100px;
+			bottom: 100px;
+			height: 72px;
+			width: 71px;
+			transition: left 0.1s linear;
+			z-index: 3;
+			background: url(mario.png) left center;
+			background-size: 1200px;
+			background-repeat: no-repeat;
+			background-position-y: 25px;
+		}
+
+		#mario.jumping {
+			animation: jump 1s ease 0s  infinite normal ;
+			/*animation-fill-mode: forwards;*/
+
+		}
+
+		/* JUMPING */
+
+		@keyframes jump {
+			0%{
+				-webkit-transform: translateY(0);
+				transform: translateY(0);
+				background-position-x: -1055px;
+			}
+			20%{
+				-webkit-transform: translateY(0);
+				transform: translateY(0);
+			}
+			40%{
+				-webkit-transform: translateY(-120px);
+				transform: translateY(-120px);
+			}
+			50%{
+				-webkit-transform: translateY(0);
+				transform: translateY(0);
+			}
+			60%{
+				-webkit-transform: translateY(-15px);
+				transform: translateY(-15px);
+			}
+			80%{
+				-webkit-transform: translateY(0);
+				transform: translateY(0);
+				background-position-x: -1055px
+			}
+			100%{
+				-webkit-transform: translateY(0);
+				transform: translateY(0);
+				
+			}
+		}
+
+		#mario.lookingLeft {
+			background-position-x: -518px;
+		}
+
+		#mario.lookingRight {
+			background-position-x: -610px;
+		}
+
+		#mario.runningRight {
+			animation: rightRunning 0.5s steps(3) infinite;
+			background-position-x: -700px;
+		}
+
+		#mario.runningLeft {
+			animation: leftRunning 0.5s steps(3) infinite;
+			background-position-x: -430px;
+		}
+		
+		@keyframes rightRunning{
+			100%{background-position-x: -965px;}
+		}
+
+		@keyframes leftRunning{
+			100%{background-position-x: -165px;}
+		}
+
+		/* SCORE BAR */
+
+		.topline-mario{
+			position:absolute;
+		}
+		.topline-world{
+			position:absolute;
+			left:55%;
+		}
+		.topline-time{
+			position:absolute;
+			left: 85%;
+		}
+		#bottomline-score{
+			position:absolute;
+			top: 90px;
+		}
+		#bottomline-coin{
+			position:absolute;
+			top: 80px;
+			left:30%;
+		}
+		.bottomline-world{
+			position:absolute;
+			top: 90px;
+			left:55.7%;
+		}
+		.bottomline-time{
+			position:absolute;
+			top: 90px;
+			left:85.5%;
+		}
+		.scorebar{    
+			position: absolute;
+			height: 120px;
+			width:100%;    
+			z-index: 10;
+			font-family: 'Press Start 2P', cursive;
+			font-size: 180%;
+			color: white;
+
+			padding-left: 50px;
+			padding-right: 50px;
+			line-height: 0.2;
+		}
+
+		div#block {
+			position: absolute;
+			width: 50px;
+			height: 50px;
+			left: 789px;
+			top: 419px;
+			z-index: 3;
+		}
+
+		#coin {
+			position: absolute;
+			z-index: -1;
+			bottom: 10px;
+			width: 24px;
+			left: 13px;
+			
+
+		}
+		#coin.active{
+			animation: flip 0.5s normal;
+			animation-fill-mode: forwards;
+		}
+
+
+	@keyframes flip {
+		0%   {     bottom: 10px; }
+		50%   { bottom:100px; }
+		100% { bottom:10px; }
+	}
+
+
+</style>
+</body>
