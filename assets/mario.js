@@ -1,4 +1,4 @@
-
+var MarioGame = {};
 
 var container = document.getElementById("container");
 var foreground = document.getElementById("foreground")
